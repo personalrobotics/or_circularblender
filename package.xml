@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>or_circularsmoother</name>
+  <version>1.1.0</version>
+  <description>
+    An OpenRAVE wrapper to an algorithm for computing a time-optimal
+    trajectory to follow a path with bounded acceleration and velocity.
+
+    It is based on code provided by Tobias Kunz:
+      https://github.com/tobiaskunz/trajectories
+
+    which implements the technique described in the paper:
+    Time-Optimal Trajectory Generation for Path Following with Bounded
+    Acceleration and Velocity by Tobias Kunz and Mike Stilman, appearing
+    in RSS 2008,
+  </description>
+  <license>BSD</license>
+  <url type="website">https://github.com/personalrobotics/or_circularsmoother</url>
+  <url type="repository">https://github.com/personalrobotics/or_circularsmoother.git</url>
+  <url type="bugtracker">https://github.com/personalrobotics/or_circularsmoother/issues</url>
+  <maintainer email="mkoval@cs.cmu.edu">Michael Koval</maintainer>
+  <author email="mkoval@cs.cmu.edu">Michael Koval</author>
+  <author email="pkv@cs.cmu.edu">Pras Velagapudi</author>
+  <author email="tobias@gatech.edu">Tobias Kunz</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>boost</depend>
+  <depend>openrave_catkin</depend>
+</package>
