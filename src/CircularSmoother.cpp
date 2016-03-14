@@ -128,7 +128,9 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
         BOOST_ASSERT(waypoint_values.size() == num_dof);
 
         // Convert the waypoints to Eigen data structures.
-        Eigen::VectorXd waypoint(waypoint_values.data(), waypoint_values.size());
+        Eigen::VectorXd waypoint(num_dof);
+        for (size_t i_dof = 0; i_dof < num_dof; ++i_dof)
+            waypoint_values[i_dof] = waypoint_values[i_dof];
         waypoints.push_back(waypoint);
     }
     RAVELOG_DEBUG("Setting %d waypoints.\n", waypoints.size());

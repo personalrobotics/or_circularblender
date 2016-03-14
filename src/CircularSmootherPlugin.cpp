@@ -11,7 +11,7 @@ InterfaceBasePtr CreateInterfaceValidated(
         std::istream &sinput, EnvironmentBasePtr penv)
 {
     if (type == PT_Planner && interfacename == "kunzcircularsmoother") {
-        return boost::make_shared<ParabolicSmoother>(penv);
+        return boost::make_shared<CircularSmoother>(penv);
     } else {
         return InterfaceBasePtr();
     }
