@@ -1,6 +1,7 @@
+#include "CircularSmoother.h"
+
 #include <boost/make_shared.hpp>
 #include <openrave/plugin.h>
-#include "CircularSmoother.h"
 
 using namespace OpenRAVE;
 using or_circularsmoother::CircularSmoother;

@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(or_circularsmoother)
 
-find_package(catkin REQUIRED COMPONENTS openrave_catkin)
+find_package(catkin REQUIRED COMPONENTS cmake_modules openrave_catkin)
 find_package(OpenRAVE REQUIRED)
 find_package(Boost REQUIRED COMPONENTS chrono system)
+find_package(Eigen REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
@@ -12,7 +13,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS openrave_catkin
-  DEPENDS boost
+  DEPENDS boost eigen
 )
 
 ###########
@@ -24,6 +25,7 @@ include_directories(
   ${OpenRAVE_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -35,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
   ${OpenRAVE_LIBRARIES}
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${Eigen_LIBRARIES}
 )
 
 openrave_plugin(${PROJECT_NAME}_plugin

@@ -1,10 +1,12 @@
+#include "CircularSmoother.h"
+#include "Path.h"
+#include "Trajectory.h"
+
 #include <boost/chrono.hpp>
 #include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
 #include <Eigen/Core>
 #include <openrave/planningutils.h>
-
-#include "CircularSmoother.h"
 
 using boost::make_shared;
 using OpenRAVE::EnvironmentBasePtr;
@@ -19,10 +21,15 @@ void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
                      Trajectory const &input_traj,
                      double t, double dt)
 {
-    const auto q = input_traj.getPosition(t);
-    const auto qd = input_traj.getVelocity(t);
+    OpenRAVE::ConfigurationSpecification const cspec
+        = output_traj->GetConfigurationSpecification();
 
-    std::vector<OpenRAVE::dReal> waypoint(cspec.GetDOF());
+    const Eigen::VectorXd q = input_traj.getPosition(t);
+    const Eigen::VectorXd qd = input_traj.getVelocity(t);
+    BOOST_ASSERT(q.size() == qd.size());
+    const size_t num_dof = q.size();
+
+    std::vector<OpenRAVE::dReal> waypoint;
     for (size_t i_dof = 0; i_dof < num_dof; ++i_dof) {
         waypoint[i_dof] = q[i_dof];
         waypoint[i_dof + num_dof] = qd[i_dof];
@@ -92,7 +99,8 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
 
     // TODO: How do we do this properly?
     // Change the interpolation of the trajectory to quadratic.
-    BOOST_FOREACH(auto &group, pos_cspec._vgroups)
+    BOOST_FOREACH(ConfigurationSpecification::Group &group,
+                  pos_cspec._vgroups)
     {
         group.interpolation = "quadratic";
     }
@@ -117,7 +125,7 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
         // Copy the waypoint to a std::vector.
         std::vector<OpenRAVE::dReal> waypoint_values;
         traj->GetWaypoint(i_waypoint, waypoint_values, pos_cspec);
-        BOOST_ASSERT(waypoint.size() == num_dof);
+        BOOST_ASSERT(waypoint_values.size() == num_dof);
 
         // Convert the waypoints to Eigen data structures.
         Eigen::VectorXd waypoint(waypoint_values.data(), waypoint_values.size());
@@ -127,7 +135,7 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
 
     // Perform circular blend trajectory creation.
     Trajectory trajectory(Path(waypoints, 0.1),
-                          maxVelocity, maxAcceleration
+                          max_velocity, max_acceleration,
                           parameters_->integration_step_);
     trajectory.outputPhasePlaneTrajectory();
     if (!trajectory.isValid())
@@ -151,14 +159,15 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
 
     // Insert an interpolation of the solution as the output trajectory.
     // The delta-time for the first waypoint is always zero.
-    for (const double t = 0.0; t < duration; t += dt)
-        ConvertWaypoint(output_traj, input_traj, t, (t == 0.0) ? 0.0 : dt);
+    double t = 0.0;
+    for (; t < duration; t += dt)
+        ConvertWaypoint(traj, trajectory, t, (t == 0.0) ? 0.0 : dt);
 
     // Manually insert the last waypoint when necessary.
     // Most of the time, the final iterated waypoint will not match the
     // duration exactly, but this catches the edge case where it does.
     if (t != duration)
-        ConvertWaypoint(output_traj, input_traj, duration, duration - (t - dt));
+        ConvertWaypoint(traj, trajectory, duration, duration - (t - dt));
 
     return OpenRAVE::PS_HasSolution;
 }

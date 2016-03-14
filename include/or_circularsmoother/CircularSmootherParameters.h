@@ -79,11 +79,11 @@ protected:
         {
             if (name == "integration_step")
             {
-                _ss >> time_limit_;
+                _ss >> integration_step_;
             }
             else if (name == "interpolation_step")
             {
-                _ss >> time_limit_;
+                _ss >> interpolation_step_;
             }
             else
             {

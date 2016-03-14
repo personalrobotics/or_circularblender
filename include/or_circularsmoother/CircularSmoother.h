@@ -1,7 +1,6 @@
 #ifndef CIRCULARSMOOTHER_H_
 #define CIRCULARSMOOTHER_H_
 #include <openrave/openrave.h>
-#include "DynamicPath.h"
 #include "CircularSmootherParameters.h"
 
 namespace or_circularsmoother {

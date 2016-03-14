@@ -23,6 +23,7 @@
   <author email="pkv@cs.cmu.edu">Pras Velagapudi</author>
   <author email="tobias@gatech.edu">Tobias Kunz</author>
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>cmake_modules</build_depend>
   <depend>boost</depend>
   <depend>openrave_catkin</depend>
 </package>
