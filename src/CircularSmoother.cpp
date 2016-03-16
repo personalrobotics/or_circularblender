@@ -142,6 +142,8 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
     RAVELOG_DEBUG("Setting %d waypoints.\n", waypoints.size());
 
     // Perform circular blend trajectory creation.
+    RAVELOG_DEBUG("Solving trajectory (step: %f, deviation: %f).\n",
+                  parameters_->integration_step_, parameters_->max_deviation_);
     Trajectory trajectory(Path(waypoints,
                                parameters_->max_deviation_),
                           max_velocity, max_acceleration,
@@ -162,7 +164,8 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
     OpenRAVE::ConfigurationSpecification output_cspec = pos_cspec + vel_cspec;
     output_cspec.AddDeltaTimeGroup();
 
-    RAVELOG_DEBUG("Creating output trajectory (duration: %f).\n", duration);
+    RAVELOG_DEBUG("Resampling trajectory (step: %f, duration: %f).\n",
+                  dt, duration);
     OpenRAVE::planningutils::ConvertTrajectorySpecification(traj, output_cspec);
 
     // Insert an interpolation of the solution as the output trajectory.
