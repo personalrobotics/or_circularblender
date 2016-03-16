@@ -146,7 +146,6 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
                                parameters_->max_deviation_),
                           max_velocity, max_acceleration,
                           parameters_->integration_step_);
-    trajectory.outputPhasePlaneTrajectory();
     if (!trajectory.isValid())
     {
         RAVELOG_WARN("Trajectory generation failed.\n");
