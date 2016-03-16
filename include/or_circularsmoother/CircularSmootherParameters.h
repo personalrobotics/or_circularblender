@@ -9,11 +9,13 @@ class CircularSmootherParameters
 public:
     CircularSmootherParameters()
         : is_processing_(false)
-        , integration_step_(0.001)
+        , integration_step_(0.01)
         , interpolation_step_(0.01)
+        , max_deviation_(0.1)
     {
         _vXMLParameters.push_back("integration_step");
         _vXMLParameters.push_back("interpolation_step");
+        _vXMLParameters.push_back("max_deviation");
     }
 
     virtual void copy(boost::shared_ptr<PlannerParameters const> r)
@@ -26,6 +28,7 @@ public:
             is_processing_ = p->is_processing_;
             integration_step_ = p->integration_step_;
             interpolation_step_ = p->interpolation_step_;
+            max_deviation_ = p->max_deviation_;
         }
 
         PlannerParameters::copy(r);
@@ -34,6 +37,7 @@ public:
     bool is_processing_;    
     double integration_step_;
     double interpolation_step_;
+    double max_deviation_;
 
 protected:
     virtual bool serialize(std::ostream &stream) const
@@ -42,7 +46,8 @@ protected:
             return false;
 
         stream << "<integration_step>" << integration_step_ << "</integration_step>\n"
-               << "<interpolation_step>" << interpolation_step_ << "</interpolation_step>\n";
+               << "<interpolation_step>" << interpolation_step_ << "</interpolation_step>\n"
+               << "<max_deviation>" << max_deviation_ << "</max_deviation>\n";
 
         return !!stream;
     }
@@ -66,7 +71,8 @@ protected:
 
         is_processing_ =
              name == "integration_step"
-          || name == "interpolation_step";
+          || name == "interpolation_step"
+          || name == "max_deviation";
         return is_processing_ ? PE_Support : PE_Pass;
     }
 
@@ -78,17 +84,14 @@ protected:
         if (is_processing_)
         {
             if (name == "integration_step")
-            {
                 _ss >> integration_step_;
-            }
             else if (name == "interpolation_step")
-            {
                 _ss >> interpolation_step_;
-            }
+            else if (name == "max_deviation")
+                _ss >> max_deviation_;
             else
-            {
                 RAVELOG_WARN(str(format("Unknown tag '%s'.\n") % name));
-            }
+
             is_processing_ = false;
             return false;
         }

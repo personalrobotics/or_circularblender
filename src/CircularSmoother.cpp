@@ -24,18 +24,24 @@ void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
     OpenRAVE::ConfigurationSpecification const cspec
         = output_traj->GetConfigurationSpecification();
 
+    // Query a particular waypoint on the trajectory.
     const Eigen::VectorXd q = input_traj.getPosition(t);
     const Eigen::VectorXd qd = input_traj.getVelocity(t);
-    BOOST_ASSERT(q.size() == qd.size());
     const size_t num_dof = q.size();
 
-    std::vector<OpenRAVE::dReal> waypoint;
+    // Verify that the DOF spec matches the expected size.
+    BOOST_ASSERT((2*num_dof+1) == cspec.GetDOF());
+    BOOST_ASSERT(q.size() == qd.size());
+
+    // Convert each waypoint to OpenRAVE waypoint.
+    std::vector<OpenRAVE::dReal> waypoint(cspec.GetDOF());
     for (size_t i_dof = 0; i_dof < num_dof; ++i_dof) {
         waypoint[i_dof] = q[i_dof];
         waypoint[i_dof + num_dof] = qd[i_dof];
     }
     waypoint[2 * num_dof] = dt;
 
+    // Add the waypoint to the end of the OpenRAVE trajectory.
     output_traj->Insert(output_traj->GetNumWaypoints(), waypoint, false);
 }
 
@@ -123,20 +129,21 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
     for (size_t i_waypoint = 0; i_waypoint < traj->GetNumWaypoints(); ++i_waypoint)
     {
         // Copy the waypoint to a std::vector.
-        std::vector<OpenRAVE::dReal> waypoint_values;
-        traj->GetWaypoint(i_waypoint, waypoint_values, pos_cspec);
-        BOOST_ASSERT(waypoint_values.size() == num_dof);
+        std::vector<OpenRAVE::dReal> input_waypoint;
+        traj->GetWaypoint(i_waypoint, input_waypoint, pos_cspec);
+        BOOST_ASSERT(input_waypoint.size() == num_dof);
 
         // Convert the waypoints to Eigen data structures.
-        Eigen::VectorXd waypoint(num_dof);
+        Eigen::VectorXd output_waypoint(num_dof);
         for (size_t i_dof = 0; i_dof < num_dof; ++i_dof)
-            waypoint_values[i_dof] = waypoint_values[i_dof];
-        waypoints.push_back(waypoint);
+            output_waypoint[i_dof] = input_waypoint[i_dof];
+        waypoints.push_back(output_waypoint);
     }
     RAVELOG_DEBUG("Setting %d waypoints.\n", waypoints.size());
 
     // Perform circular blend trajectory creation.
-    Trajectory trajectory(Path(waypoints, 0.1),
+    Trajectory trajectory(Path(waypoints,
+                               parameters_->max_deviation_),
                           max_velocity, max_acceleration,
                           parameters_->integration_step_);
     trajectory.outputPhasePlaneTrajectory();
