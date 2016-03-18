@@ -9,6 +9,7 @@ find_package(Eigen REQUIRED)
 ###################################
 ## catkin specific configuration ##
 ###################################
+catkin_python_setup()
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
