@@ -1,13 +1,16 @@
-#ifndef CIRCULARSMOOTHER_H_
-#define CIRCULARSMOOTHER_H_
+#ifndef CIRCULARBLENDER_H_
+#define CIRCULARBLENDER_H_
+
 #include <openrave/openrave.h>
-#include "CircularSmootherParameters.h"
+#include "CircularBlenderParameters.h"
 
-namespace or_circularsmoother {
+namespace or_circularblender
+{
 
-class CircularSmoother : public OpenRAVE::PlannerBase {
+class CircularBlender : public OpenRAVE::PlannerBase
+{
 public:
-    CircularSmoother(OpenRAVE::EnvironmentBasePtr penv);
+    CircularBlender(OpenRAVE::EnvironmentBasePtr penv);
 
     virtual bool InitPlan(OpenRAVE::RobotBasePtr robot,
                           PlannerParametersConstPtr params);
@@ -18,10 +21,9 @@ public:
     virtual PlannerParametersConstPtr GetParameters () const;
 
 private:
-    CircularSmootherParametersPtr parameters_;
+    CircularBlenderParametersPtr parameters_;
 };
 
+} // or_circularblender
 
-}
-
-#endif
+#endif // CIRCULARBLENDER_H_
