@@ -1,13 +1,16 @@
-#ifndef CIRCULARSMOOTHERPARAMETERS_H_
-#define CIRCULARSMOOTHERPARAMETERS_H_
+#ifndef CIRCULARBLENDERPARAMETERS_H_
+#define CIRCULARBLENDERPARAMETERS_H_
+
 #include <openrave/planner.h>
 
-namespace or_circularsmoother {
+namespace or_circularblender
+{
 
-class CircularSmootherParameters
-    : public OpenRAVE::PlannerBase::PlannerParameters {
+class CircularBlenderParameters
+    : public OpenRAVE::PlannerBase::PlannerParameters
+{
 public:
-    CircularSmootherParameters()
+    CircularBlenderParameters()
         : is_processing_(false)
         , integration_step_(0.01)
         , interpolation_step_(0.01)
@@ -20,8 +23,8 @@ public:
 
     virtual void copy(boost::shared_ptr<PlannerParameters const> r)
     {
-        boost::shared_ptr<CircularSmootherParameters const> p
-            = boost::dynamic_pointer_cast<CircularSmootherParameters const>(r);
+        boost::shared_ptr<CircularBlenderParameters const> p
+            = boost::dynamic_pointer_cast<CircularBlenderParameters const>(r);
         
         if (p)
         {
@@ -100,9 +103,9 @@ protected:
     }
 };
 
-typedef boost::shared_ptr<CircularSmootherParameters> CircularSmootherParametersPtr;
-typedef boost::shared_ptr<CircularSmootherParameters const> CircularSmootherParametersConstPtr;
+typedef boost::shared_ptr<CircularBlenderParameters> CircularBlenderParametersPtr;
+typedef boost::shared_ptr<CircularBlenderParameters const> CircularBlenderParametersConstPtr;
 
-} // namespace or_circularsmoother
+} // namespace or_circularblender
 
-#endif
+#endif // CIRCULARBLENDERPARAMETERS_H_

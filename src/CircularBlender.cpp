@@ -1,4 +1,4 @@
-#include "CircularSmoother.h"
+#include "CircularBlender.h"
 #include "Path.h"
 #include "Trajectory.h"
 
@@ -47,28 +47,25 @@ void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
 
 } // namespace
 
-namespace or_circularsmoother
+namespace or_circularblender
 {
 
-/*
- * CircularSmoother
- */
-CircularSmoother::CircularSmoother(EnvironmentBasePtr penv)
+CircularBlender::CircularBlender(EnvironmentBasePtr penv)
     : OpenRAVE::PlannerBase(penv)
 {
 }
 
-bool CircularSmoother::InitPlan(RobotBasePtr robot,
-                                PlannerParametersConstPtr params)
+bool CircularBlender::InitPlan(RobotBasePtr robot,
+                               PlannerParametersConstPtr params)
 {
-    parameters_ = boost::make_shared<CircularSmootherParameters>();
+    parameters_ = boost::make_shared<CircularBlenderParameters>();
     parameters_->copy(params);
     return true;
 }
 
-bool CircularSmoother::InitPlan(RobotBasePtr robot, std::istream &input)
+bool CircularBlender::InitPlan(RobotBasePtr robot, std::istream &input)
 {
-    parameters_ = boost::make_shared<CircularSmootherParameters>();
+    parameters_ = boost::make_shared<CircularBlenderParameters>();
 
     // Deserialize the PlannerParameters once. We only do this to set
     // _configurationspecification for the next step, so we put the stream back
@@ -91,7 +88,7 @@ bool CircularSmoother::InitPlan(RobotBasePtr robot, std::istream &input)
     return true;
 }
 
-OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
+OpenRAVE::PlannerStatus CircularBlender::PlanPath(TrajectoryBasePtr traj)
 {
     using OpenRAVE::ConfigurationSpecification;
     using OpenRAVE::KinBodyPtr;
@@ -184,9 +181,9 @@ OpenRAVE::PlannerStatus CircularSmoother::PlanPath(TrajectoryBasePtr traj)
 }
 
 OpenRAVE::PlannerBase::PlannerParametersConstPtr
-    CircularSmoother::GetParameters () const
+    CircularBlender::GetParameters () const
 {
     return parameters_;
 }
 
-} // namespace or_circularsmoother
+} // namespace or_circularblender

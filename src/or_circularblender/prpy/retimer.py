@@ -3,14 +3,14 @@ from prpy.planning.retimer import OpenRAVERetimer
 from prpy.planning.base import PlanningMethod
 
 
-class KunzCircularRetimer(OpenRAVERetimer):
+class KunzCircularBlender(OpenRAVERetimer):
     def __init__(self,
                  integration_timeout=0.1,
                  interpolation_timeout=0.1,
                  max_deviation=0.1,
                  **kwargs):
-        super(KunzCircularRetimer, self).__init__(
-            'KunzCircularSmoother', **kwargs)
+        super(KunzCircularBlender, self).__init__(
+            'KunzCircularBlender', **kwargs)
 
         self.default_options.update({
             'integration_timeout': float(integration_timeout),
@@ -24,5 +24,5 @@ class KunzCircularRetimer(OpenRAVERetimer):
         if options is not None:
             full_options.update(copy.deepcopy(options))
 
-        return super(KunzCircularRetimer, self).RetimeTrajectory(
+        return super(KunzCircularBlender, self).RetimeTrajectory(
             robot, path, options=full_options, **kw_args)

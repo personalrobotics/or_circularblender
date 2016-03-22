@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>or_circularsmoother</name>
+  <name>or_circularblender</name>
   <version>1.1.0</version>
   <description>
     An OpenRAVE wrapper to an algorithm for computing a time-optimal
@@ -15,12 +15,12 @@
     in RSS 2008,
   </description>
   <license>BSD</license>
-  <url type="website">https://github.com/personalrobotics/or_circularsmoother</url>
-  <url type="repository">https://github.com/personalrobotics/or_circularsmoother.git</url>
-  <url type="bugtracker">https://github.com/personalrobotics/or_circularsmoother/issues</url>
-  <maintainer email="mkoval@cs.cmu.edu">Michael Koval</maintainer>
-  <author email="mkoval@cs.cmu.edu">Michael Koval</author>
+  <url type="website">https://github.com/personalrobotics/or_circularblender</url>
+  <url type="repository">https://github.com/personalrobotics/or_circularblender.git</url>
+  <url type="bugtracker">https://github.com/personalrobotics/or_circularblender/issues</url>
+  <maintainer email="pkv@cs.cmu.edu">Pras Velagapudi</maintainer>
   <author email="pkv@cs.cmu.edu">Pras Velagapudi</author>
+  <author email="mkoval@cs.cmu.edu">Michael Koval</author>
   <author email="tobias@gatech.edu">Tobias Kunz</author>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cmake_modules</build_depend>

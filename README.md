@@ -1,8 +1,13 @@
-# or_circularsmoother #
+# or_circularblender #
 ## An OpenRAVE Plugin for trajectory timing ##
 
-This is an OpenRAVE wrapper to an algorithm for computing a time-optimal
-trajectory to follow a path with bounded acceleration and velocity.
+This is an OpenRAVE wrapper to an algorithm for converting a linear joint space
+path into a timed trajectory with bounded acceleration and velocity.  It does
+this by adding circular blends between consecutive linear path segments, and
+computing the time-optimal motion along the linear-circular-linear segments.
+
+The resulting trajectory is then reinterpolated at a fixed discretization to
+return a quadratic polynomial spline approximation of the solution.
 
 It is based on code provided by Tobias Kunz:
 https://github.com/tobiaskunz/trajectories

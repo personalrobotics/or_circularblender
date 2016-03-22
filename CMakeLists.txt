@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(or_circularsmoother)
+project(or_circularblender)
 
 find_package(catkin REQUIRED COMPONENTS cmake_modules openrave_catkin)
 find_package(OpenRAVE REQUIRED)
@@ -32,7 +32,7 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/Path.cpp
   src/Trajectory.cpp
-  src/CircularSmoother.cpp
+  src/CircularBlender.cpp
 )
 target_link_libraries(${PROJECT_NAME}
   ${OpenRAVE_LIBRARIES}
@@ -42,7 +42,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 openrave_plugin(${PROJECT_NAME}_plugin
-  src/CircularSmootherPlugin.cpp
+  src/CircularBlenderPlugin.cpp
 )
 target_link_libraries(${PROJECT_NAME}_plugin
   ${PROJECT_NAME}
