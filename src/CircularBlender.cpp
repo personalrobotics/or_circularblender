@@ -12,12 +12,15 @@ using boost::make_shared;
 using OpenRAVE::EnvironmentBasePtr;
 using OpenRAVE::RobotBasePtr;
 using OpenRAVE::TrajectoryBasePtr;
-
+using namespace or_circularblender;
 
 namespace
 {
 
-void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
+const std::vector<OpenRAVE::dReal> empty;
+
+bool ConvertWaypoint(CircularBlenderParametersPtr parameters,
+                     TrajectoryBasePtr const &output_traj,
                      Trajectory const &input_traj,
                      double t, double dt)
 {
@@ -43,12 +46,20 @@ void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
 
     // Add the waypoint to the end of the OpenRAVE trajectory.
     output_traj->Insert(output_traj->GetNumWaypoints(), waypoint, false);
+    if (output_traj->GetNumWaypoints() <= 1)
+        return true;
+
+    // Collision check the path from the previous waypoint to this one.
+    std::vector<OpenRAVE::dReal> curr_config(waypoint.begin(), waypoint.begin() + num_dof);
+    output_traj->GetWaypoint(output_traj->GetNumWaypoints() - 2, waypoint);
+    std::vector<OpenRAVE::dReal> prev_config(waypoint.begin(), waypoint.begin() + num_dof);
+
+    return !parameters->CheckPathAllConstraints(
+        prev_config, curr_config,
+        empty, empty, 0, OpenRAVE::IT_Closed);
 }
 
 } // namespace
-
-namespace or_circularblender
-{
 
 CircularBlender::CircularBlender(EnvironmentBasePtr penv)
     : OpenRAVE::PlannerBase(penv)
@@ -169,13 +180,25 @@ OpenRAVE::PlannerStatus CircularBlender::PlanPath(TrajectoryBasePtr traj)
     // The delta-time for the first waypoint is always zero.
     double t = 0.0;
     for (; t < duration; t += dt)
-        ConvertWaypoint(traj, trajectory, t, (t == 0.0) ? 0.0 : dt);
+    {
+        if (!ConvertWaypoint(parameters_, traj, trajectory, t, (t == 0.0) ? 0.0 : dt))
+        {
+            RAVELOG_WARN("Blended trajectory was in collision at time %f.\n", t);
+            return OpenRAVE::PS_Failed;
+        }
+    }
 
     // Manually insert the last waypoint when necessary.
     // Most of the time, the final iterated waypoint will not match the
     // duration exactly, but this catches the edge case where it does.
     if (t != duration)
-        ConvertWaypoint(traj, trajectory, duration, duration - (t - dt));
+    {
+        if (!ConvertWaypoint(parameters_, traj, trajectory, duration, duration - (t - dt)))
+        {
+            RAVELOG_WARN("Blended trajectory was in collision at time %f.\n", t);
+            return OpenRAVE::PS_Failed;
+        }
+    }
 
     return OpenRAVE::PS_HasSolution;
 }
@@ -185,5 +208,3 @@ OpenRAVE::PlannerBase::PlannerParametersConstPtr
 {
     return parameters_;
 }
-
-} // namespace or_circularblender
