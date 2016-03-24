@@ -11,11 +11,13 @@ class CircularBlenderParameters
 {
 public:
     CircularBlenderParameters()
-        : is_processing_(false)
+        : check_collision_(false)
+        , is_processing_(false)
         , integration_step_(0.01)
         , interpolation_step_(0.01)
         , max_deviation_(0.1)
     {
+        _vXMLParameters.push_back("check_collision");
         _vXMLParameters.push_back("integration_step");
         _vXMLParameters.push_back("interpolation_step");
         _vXMLParameters.push_back("max_deviation");
@@ -29,6 +31,7 @@ public:
         if (p)
         {
             is_processing_ = p->is_processing_;
+            check_collision_ = p->check_collision_;
             integration_step_ = p->integration_step_;
             interpolation_step_ = p->interpolation_step_;
             max_deviation_ = p->max_deviation_;
@@ -38,6 +41,7 @@ public:
     }
 
     bool is_processing_;    
+    bool check_collision_;
     double integration_step_;
     double interpolation_step_;
     double max_deviation_;
@@ -48,7 +52,8 @@ protected:
         if (!PlannerParameters::serialize(stream))
             return false;
 
-        stream << "<integration_step>" << integration_step_ << "</integration_step>\n"
+        stream << "<check_collision>" << integration_step_ << "</check_collision>\n"
+               << "<integration_step>" << integration_step_ << "</integration_step>\n"
                << "<interpolation_step>" << interpolation_step_ << "</interpolation_step>\n"
                << "<max_deviation>" << max_deviation_ << "</max_deviation>\n";
 
@@ -73,7 +78,8 @@ protected:
         }
 
         is_processing_ =
-             name == "integration_step"
+             name == "check_collision"
+          || name == "integration_step"
           || name == "interpolation_step"
           || name == "max_deviation";
         return is_processing_ ? PE_Support : PE_Pass;
@@ -86,7 +92,9 @@ protected:
 
         if (is_processing_)
         {
-            if (name == "integration_step")
+            if (name == "check_collision")
+                _ss >> check_collision_;
+            else if (name == "integration_step")
                 _ss >> integration_step_;
             else if (name == "interpolation_step")
                 _ss >> interpolation_step_;

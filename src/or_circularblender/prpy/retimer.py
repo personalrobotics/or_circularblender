@@ -5,16 +5,18 @@ from prpy.planning.base import PlanningMethod
 
 class KunzCircularBlender(OpenRAVERetimer):
     def __init__(self,
-                 integration_timeout=0.1,
-                 interpolation_timeout=0.1,
+                 check_collision=False,
+                 integration_step=0.1,
+                 interpolation_step=0.1,
                  max_deviation=0.1,
                  **kwargs):
         super(KunzCircularBlender, self).__init__(
             'KunzCircularBlender', **kwargs)
 
         self.default_options.update({
-            'integration_timeout': float(integration_timeout),
-            'interpolation_timeout': float(interpolation_timeout),
+            'check_collision': bool(check_collision),
+            'integration_step': float(integration_step),
+            'interpolation_step': float(interpolation_step),
             'max_deviation': float(max_deviation)
         })
 

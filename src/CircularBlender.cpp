@@ -19,8 +19,7 @@ namespace
 
 const std::vector<OpenRAVE::dReal> empty;
 
-bool ConvertWaypoint(CircularBlenderParametersPtr parameters,
-                     TrajectoryBasePtr const &output_traj,
+void ConvertWaypoint(TrajectoryBasePtr const &output_traj,
                      Trajectory const &input_traj,
                      double t, double dt)
 {
@@ -46,17 +45,38 @@ bool ConvertWaypoint(CircularBlenderParametersPtr parameters,
 
     // Add the waypoint to the end of the OpenRAVE trajectory.
     output_traj->Insert(output_traj->GetNumWaypoints(), waypoint, false);
-    if (output_traj->GetNumWaypoints() <= 1)
-        return true;
+}
 
-    // Collision check the path from the previous waypoint to this one.
-    std::vector<OpenRAVE::dReal> curr_config(waypoint.begin(), waypoint.begin() + num_dof);
-    output_traj->GetWaypoint(output_traj->GetNumWaypoints() - 2, waypoint);
-    std::vector<OpenRAVE::dReal> prev_config(waypoint.begin(), waypoint.begin() + num_dof);
+bool CheckCollision(CircularBlenderParametersPtr parameters,
+                    TrajectoryBasePtr const &traj, int num_dof)
+{
+    std::vector<OpenRAVE::dReal> waypoint;
 
-    return !parameters->CheckPathAllConstraints(
-        prev_config, curr_config,
-        empty, empty, 0, OpenRAVE::IT_Closed);
+    traj->GetWaypoint(0, waypoint);
+    std::vector<OpenRAVE::dReal> q_a(waypoint.begin(),
+                                     waypoint.begin() + num_dof);
+    std::vector<OpenRAVE::dReal> qd_a(waypoint.begin() + num_dof,
+                                      waypoint.begin() + 2*num_dof);
+    bool is_collided = parameters->CheckPathAllConstraints(
+        q_a, q_a, empty, empty, 0, OpenRAVE::IT_OpenStart
+    );
+
+    for (int i = 1; i < traj->GetNumWaypoints() - 1; ++i)
+    {
+        traj->GetWaypoint(i, waypoint);
+        std::vector<OpenRAVE::dReal> q_b(waypoint.begin(),
+                                         waypoint.begin() + num_dof);
+        std::vector<OpenRAVE::dReal> qd_b(waypoint.begin() + num_dof,
+                                          waypoint.begin() + 2*num_dof);
+        is_collided |= parameters->CheckPathAllConstraints(
+            q_a, q_b, qd_a, qd_b, 0, OpenRAVE::IT_OpenStart
+        );
+
+        q_a = q_b;
+        qd_a = qd_b;
+    }
+
+    return is_collided;
 }
 
 } // namespace
@@ -172,7 +192,7 @@ OpenRAVE::PlannerStatus CircularBlender::PlanPath(TrajectoryBasePtr traj)
     OpenRAVE::ConfigurationSpecification output_cspec = pos_cspec + vel_cspec;
     output_cspec.AddDeltaTimeGroup();
 
-    RAVELOG_DEBUG("Resampling trajectory (step: %f, duration: %f).\n",
+    RAVELOG_WARN("Resampling trajectory (step: %f, duration: %f).\n",
                   dt, duration);
     OpenRAVE::planningutils::ConvertTrajectorySpecification(traj, output_cspec);
 
@@ -180,27 +200,19 @@ OpenRAVE::PlannerStatus CircularBlender::PlanPath(TrajectoryBasePtr traj)
     // The delta-time for the first waypoint is always zero.
     double t = 0.0;
     for (; t < duration; t += dt)
-    {
-        if (!ConvertWaypoint(parameters_, traj, trajectory, t, (t == 0.0) ? 0.0 : dt))
-        {
-            RAVELOG_WARN("Blended trajectory was in collision at time %f.\n", t);
-            return OpenRAVE::PS_Failed;
-        }
-    }
+        ConvertWaypoint(traj, trajectory, t, (t == 0.0) ? 0.0 : dt);
 
     // Manually insert the last waypoint when necessary.
     // Most of the time, the final iterated waypoint will not match the
     // duration exactly, but this catches the edge case where it does.
     if (t != duration)
-    {
-        if (!ConvertWaypoint(parameters_, traj, trajectory, duration, duration - (t - dt)))
-        {
-            RAVELOG_WARN("Blended trajectory was in collision at time %f.\n", t);
-            return OpenRAVE::PS_Failed;
-        }
-    }
+        ConvertWaypoint(traj, trajectory, duration, duration - (t - dt));
 
-    return OpenRAVE::PS_HasSolution;
+    // Collision check the trajectory if requested.
+    if (!parameters_->check_collision_)
+        return OpenRAVE::PS_HasSolution;
+    return (CheckCollision(parameters_, traj, num_dof)) ?
+        OpenRAVE::PS_Failed : OpenRAVE::PS_HasSolution;
 }
 
 OpenRAVE::PlannerBase::PlannerParametersConstPtr

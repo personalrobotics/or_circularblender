@@ -19,5 +19,7 @@ which implements the technique described in the paper:
 
 This algorithm takes the following parameters (with the specified default values):
 
+- `<check_collision>False</check_collision>`: If the blended trajectory should be re-checked for collisions
 - `<integration_step>0.001</integration_step>`: The integration step size.
 - `<interpolation_step>0.01</interpolation_step>`: The interpolation step size.
+- `<max_deviation>0.1</max_deviation>`: The maximum allowed deviation from the original trajectory
