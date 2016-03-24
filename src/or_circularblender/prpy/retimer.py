@@ -20,9 +20,6 @@ class KunzCircularBlender(OpenRAVERetimer):
 
     @PlanningMethod
     def RetimeTrajectory(self, robot, path, options=None, **kw_args):
-        full_options = copy.deepcopy(self.default_options)
-        if options is not None:
-            full_options.update(copy.deepcopy(options))
-
+        new_options = deepcopy(options) if options else dict()
         return super(KunzCircularBlender, self).RetimeTrajectory(
-            robot, path, options=full_options, **kw_args)
+            robot, path, options=new_options, **kw_args)
