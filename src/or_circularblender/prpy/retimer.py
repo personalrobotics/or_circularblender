@@ -1,4 +1,4 @@
-import copy
+from copy import deepcopy
 from prpy.planning.retimer import OpenRAVERetimer
 from prpy.planning.base import PlanningMethod
 
