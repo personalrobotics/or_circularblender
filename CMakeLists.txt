@@ -28,6 +28,9 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
   ${Eigen_INCLUDE_DIRS}
 )
+link_directories(
+  ${OpenRAVE_LIBRARY_DIRS}
+)
 
 add_library(${PROJECT_NAME}
   src/Path.cpp
